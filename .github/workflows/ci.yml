@@ -1,0 +1,17 @@
+name: Check
+on:
+  push:
+    branches: [main]
+  pull_request:
+permissions:
+  contents: read
+jobs:
+  test:
+    runs-on: macos-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: python3 scripts/test-runtime.py .build/debug/drink
+      - run: sh -n install.sh uninstall.sh scripts/build-release.sh
+      - run: swift run drink coffee 1s --demo --no-animation

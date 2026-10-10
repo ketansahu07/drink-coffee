@@ -1,0 +1,28 @@
+name: Release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: macos-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: python3 scripts/test-runtime.py .build/debug/drink
+      - run: sh scripts/build-release.sh
+      - run: sh scripts/test-installer.sh
+      - name: Verify native binary
+        run: |
+          ./dist/drink --version
+          ./dist/drink coffee 1s --demo --no-animation
+          lipo ./dist/drink -verify_arch arm64 x86_64
+      - name: Publish installers
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+            dist/drink-macos-universal.tar.gz dist/SHA256SUMS \
+            --verify-tag --title "drink coffee $GITHUB_REF_NAME" --generate-notes
