@@ -243,7 +243,9 @@ private struct CoffeeMesh {
             return x * x * (3 - 2 * x)
         }
         let lift = smooth((phase - 1.8) / 2.4) * (1 - smooth((phase - 7.1) / 2.6))
-        let cup = CoffeeVector(1.52 - 0.88 * lift, 0.285 + 0.985 * lift, 0.86 + 0.08 * lift)
+        let restingCup = CoffeeVector(1.52, 0.285, 0.86)
+        let sippingCup = CoffeeVector(0.28, 0.995, 0.94)
+        let cup = restingCup + (sippingCup - restingCup) * lift
         let hand = cup + CoffeeVector(0.27, -0.10, 0)
         let elbow = CoffeeVector(1.34 + 0.30 * lift, 0.47 + 0.08 * lift, 0.23)
         mesh.rod(CoffeeVector(1.03, 1.04, 0.02), elbow, 0.11)
